@@ -1,5 +1,7 @@
 # Let's play with AWS Fargate (and a Spring Boot test workload) 
 
+(diagrams somewhat out of sync with sample code - adjustments to blue green env required)
+
 ![High Level Overview](drawio/overview.png)
 
 Vertical architecture slice:
@@ -26,13 +28,14 @@ Disclaimer:
 Steps:
 
     ./setup.sh dev
-    ./curl-loop.sh dev
+    ./curl-loop-blue.sh dev
 
 ### Deploy new application version to dev env (mvn build, docker push & Fargate deploy)
 
 Steps:
 
-    ./update.sh dev
+    ./update-green.sh dev
+	./toggle-blue-green.sh dev
 
 ### Automated AWS dev env teardown (delete all CloudFormation stacks)
 
@@ -64,19 +67,22 @@ Steps:
 
 Steps:
 	
-	./update.sh dev
+	./update-green.sh dev
+	./toggle-blue-green.sh dev
 
 ### Staging from dev to test
 
 Steps:
 
-	./update-n.sh test dev
+	./update-green-n.sh test dev
+	./toggle-blue-green.sh test
 
 ### Staging from test to prod
 
 Steps:
 
-	./update-n.sh prod test
+	./update-green-n.sh prod test
+	./toggle-blue-green.sh prod
 
 ### AWS teardown (dev, test & prod)
 
@@ -91,6 +97,8 @@ Steps:
 	./teardown.sh dev
 
 ## Behind the scenes (CloudFormation and AWS CLI)
+
+(currently somewhat out of sync with sample code - adjustments to blue green env required)
 
 ![CloudFormation Stacks](drawio/stacks.png)
 
@@ -473,11 +481,9 @@ Test it:
         
     curl --insecure https://$(./get-stack-output.sh samplewebworkload-lb-dev LoadBalancer)/ #access via ACM cert hostname does not need --insecure
 
-## AWS Infrastructure - dev environment in one diagram
-
-![Infrastructure Details](drawio/alb-fargate-rds-ssm.png)
-
 # [Bonus] Let's build a simplistic CI(/CD) pipeline (still in alpha)
+
+(currently broken - adjustments to blue green env required)
 
 ![CodePipeline in action](drawio/pipeline.png)
 
