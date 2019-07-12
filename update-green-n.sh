@@ -9,6 +9,6 @@ SOURCE_PREFIX=${2:-default}
 echo Environment: $PREFIX based on $SOURCE_PREFIX
 
 echo Update Fargate Stack
-./update-stack-fargate-n.sh $PREFIX $SOURCE_PREFIX 
+./update-stack-green-fargate-n.sh $PREFIX $SOURCE_PREFIX 
 
 aws cloudformation wait stack-update-complete --stack-name $STACK_PREFIX-ecs

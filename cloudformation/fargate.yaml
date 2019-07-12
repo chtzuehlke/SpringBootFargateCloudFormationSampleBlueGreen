@@ -221,3 +221,6 @@ Outputs:
 
   DockerImage:
     Value: !Ref DockerImage
+
+  DockerImage2:
+    Value: !Ref DockerImage2

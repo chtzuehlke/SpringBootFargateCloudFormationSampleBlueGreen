@@ -1,10 +1,10 @@
 #!/bin/bash
 #FIXME error- and retry logic - until then, execute this step-by-step
 
-PREFIX=${1:-default}
+PREFIX=$1
 STACK_PREFIX="helloworld-$PREFIX"
 
-SOURCE_PREFIX=${2:-default}
+SOURCE_PREFIX=$2
 
 echo Environment: $PREFIX based on $SOURCE_PREFIX
 
