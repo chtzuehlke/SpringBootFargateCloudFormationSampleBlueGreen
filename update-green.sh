@@ -15,6 +15,6 @@ VERSION=$(./mvn-project-version.sh)-$(date '+%Y%m%d%H%M%S')
 ./docker-tag-and-push.sh $PREFIX $VERSION
 
 echo Update Fargate Stack $VERSION
-./update-stack-fargate.sh $PREFIX $VERSION 
+./update-stack-green-fargate.sh $PREFIX $VERSION 
 
 aws cloudformation wait stack-update-complete --stack-name $STACK_PREFIX-ecs

@@ -8,22 +8,40 @@ Parameters:
   NetworkStack:
     Type: String
 
+  BlueTarget:
+    Type: String
+
 Conditions:
   EnableTLS: !Not
     - "Fn::Equals":
         - Ref: CertificateArn
         - NONE
 
+  BlueTarget2: !Not
+    - "Fn::Equals":
+        - Ref: BlueTarget
+        - two      
+
 Resources:
   Listener:
     Type: "AWS::ElasticLoadBalancingV2::Listener"
     Properties:
       DefaultActions:
-        - TargetGroupArn: !Ref TargetGroup
+        - TargetGroupArn: !If [BlueTarget2, !Ref TargetGroup2, !Ref TargetGroup]
           Type: forward
       LoadBalancerArn: !Ref LoadBalancer
       Port: 80
       Protocol: HTTP
+
+  Listener2:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !If [BlueTarget2, !Ref TargetGroup, !Ref TargetGroup2]
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 8080
+      Protocol: HTTP      
 
   LoadBalancer:
     Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
@@ -68,6 +86,23 @@ Resources:
       VpcId: !ImportValue
         "Fn::Sub": ${NetworkStack}-VPC
 
+  TargetGroup2:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: /
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Port: 8080
+      Protocol: HTTP
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 60
+      TargetType: ip
+      UnhealthyThresholdCount: 4
+      VpcId: !ImportValue
+        "Fn::Sub": ${NetworkStack}-VPC
+
 Outputs:
   LoadBalancer:
     Value: !GetAtt LoadBalancer.DNSName
@@ -78,3 +113,11 @@ Outputs:
     Value: !Ref TargetGroup
     Export:
       Name: !Sub "${AWS::StackName}-TargetGroup"
+
+  TargetGroup2:
+    Value: !Ref TargetGroup2
+    Export:
+      Name: !Sub "${AWS::StackName}-TargetGroup2"      
+
+  BlueTarget:
+      Value: !Ref BlueTarget

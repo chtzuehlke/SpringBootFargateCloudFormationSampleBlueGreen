@@ -13,8 +13,17 @@ Parameters:
   NetworkStack:
     Type: String
 
+  TargetGroup:
+    Type: String
+  
   DockerImage:
     Type: String
+
+  TargetGroup2:
+    Type: String
+
+  DockerImage2:
+    Type: String    
 
 Resources:
   ECSExecutionRole:
@@ -49,8 +58,7 @@ Resources:
       LoadBalancers:
         - ContainerName: !Ref "AWS::StackName"
           ContainerPort: 8080
-          TargetGroupArn: !ImportValue
-            "Fn::Sub": ${LoadBalancerStack}-TargetGroup
+          TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -62,6 +70,31 @@ Resources:
       PlatformVersion: LATEST
       SchedulingStrategy: REPLICA
       TaskDefinition: !Ref TaskDefinition
+
+  FargateService2:
+    Type: "AWS::ECS::Service"
+    Properties:
+      Cluster: !Ref FargateCluster
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 100
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: !Ref "AWS::StackName"
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup2
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - "Fn::ImportValue": !Sub ${NetworkStack}-ApplicationSG
+          Subnets: !Split
+            - ","
+            - "Fn::ImportValue": !Sub ${NetworkStack}-Subnets
+      PlatformVersion: LATEST
+      SchedulingStrategy: REPLICA
+      TaskDefinition: !Ref TaskDefinition2
 
   TaskDefinition:
     Type: "AWS::ECS::TaskDefinition"
@@ -81,6 +114,45 @@ Resources:
               Value: !Ref DBPassSSMName
           Essential: true
           Image: !Ref "DockerImage"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref TaskLogGroup
+              awslogs-region: !Ref "AWS::Region"
+              awslogs-stream-prefix: ecs
+          Memory: "2048"
+          MemoryReservation: "2048"
+          Name: !Ref "AWS::StackName"
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+      Cpu: "1024"
+      ExecutionRoleArn: !GetAtt ECSExecutionRole.Arn
+      Family: !Ref "AWS::StackName"
+      Memory: "2048"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !GetAtt TaskRole.Arn
+
+  TaskDefinition2:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      ContainerDefinitions:
+        - Cpu: "1024"
+          Environment:
+            - Name: SPRING_PROFILES_ACTIVE
+              Value: aws            
+            - Name: DBPort
+              Value: !ImportValue
+                "Fn::Sub": ${DatabaseStack}-DBPort
+            - Name: DBAddress
+              Value: !ImportValue
+                "Fn::Sub": ${DatabaseStack}-DBAddress
+            - Name: DBPassSSMName
+              Value: !Ref DBPassSSMName
+          Essential: true
+          Image: !Ref "DockerImage2"
           LogConfiguration:
             LogDriver: awslogs
             Options:

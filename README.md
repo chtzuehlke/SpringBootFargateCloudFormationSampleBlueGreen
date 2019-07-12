@@ -518,3 +518,4 @@ Trigger build and deploy:
 - Version 1.3: scripts refactored and staging introduced (e.g. dev to test to prod)
 - Version 1.4: build pipeline (currently with "barn door IAM policies" in certain roles)
 - Version 1.5: resolved build pipeline teardown issues (CF role deleted too early)
+- Version 2.0: blue/green (highly experimental)

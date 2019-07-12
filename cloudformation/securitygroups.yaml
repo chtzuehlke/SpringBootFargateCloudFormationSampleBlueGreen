@@ -43,6 +43,10 @@ Resources:
           FromPort: 80
           IpProtocol: tcp
           ToPort: 80
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 8080
+          IpProtocol: tcp
+          ToPort: 8080
       VpcId: !Ref VPC
 
   #FIXME apply principle of least privilege & move to sep. CF stack
