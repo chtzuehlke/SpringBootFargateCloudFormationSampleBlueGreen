@@ -26,14 +26,18 @@ phases:
         if [ "$BLUETARGET" = "one" ]; 
         then
           printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $REMOTE_TAG $DOCKER_IMAGE2 > fargateconfig.json
+          printf '{"Parameters":{"BlueTarget":"two"}}' > albconfig.json
         else
           printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $DOCKER_IMAGE $REMOTE_TAG > fargateconfig.json
+          printf '{"Parameters":{"BlueTarget":"one"}}' > albconfig.json
         fi        
       - cat fargateconfig.json      
+      - cat albconfig.json
 
 artifacts:
     files: 
       - fargateconfig.json
+      - albconfig.json      
 
 cache:
     paths:
