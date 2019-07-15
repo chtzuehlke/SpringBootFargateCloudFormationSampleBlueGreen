@@ -20,6 +20,10 @@ Parameters:
     Type: String
   NetworkStack:
     Type: String
+  TargetGroup:
+    Type: String
+  TargetGroup2:
+    Type: String
   CloudFormationRole:
     Type: String
 
@@ -138,6 +142,12 @@ Resources:
           - Name: "REPO_URL"
             Type: "PLAINTEXT"
             Value: !Ref RepoUrl
+          - Name: "ALB_STACK"
+            Type: "PLAINTEXT"
+            Value: !Ref LoadBalancerStack
+          - Name: "FARGATE_STACK"
+            Type: "PLAINTEXT"
+            Value: !Ref FargateStackName
         Image: "aws/codebuild/java:openjdk-8"
         ImagePullCredentialsType: "CODEBUILD"
         PrivilegedMode: true
@@ -216,7 +226,9 @@ Resources:
                     "NetworkStack":"${NetworkStack}",
                     "LoadBalancerStack":"${LoadBalancerStack}",
                     "DatabaseStack":"${DatabaseStack}",
-                    "DBPassSSMName":"${DBPassSSMName}"
+                    "DBPassSSMName":"${DBPassSSMName}",
+                    "TargetGroup":"${TargetGroup}",
+                    "TargetGroup2":"${TargetGroup2}"
                   }
               InputArtifacts:
                 - Name: CloudformationArtifact

@@ -23,7 +23,7 @@ phases:
         BLUETARGET=$(aws cloudformation describe-stacks --stack-name $ALB_STACK --query "Stacks[0].Outputs[?OutputKey=='BlueTarget'].OutputValue" --output text)
         DOCKER_IMAGE=$(aws cloudformation describe-stacks --stack-name $FARGATE_STACK --query "Stacks[0].Outputs[?OutputKey=='DockerImage'].OutputValue" --output text)
         DOCKER_IMAGE2=$(aws cloudformation describe-stacks --stack-name $FARGATE_STACK --query "Stacks[0].Outputs[?OutputKey=='DockerImage2'].OutputValue" --output text)
-        if [ "$BLUETARGET" == "one" ]; 
+        if [ "$BLUETARGET" = "one" ]; 
         then
           printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $REMOTE_TAG $DOCKER_IMAGE2 > fargateconfig.json
         else
