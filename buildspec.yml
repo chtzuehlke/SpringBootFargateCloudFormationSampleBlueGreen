@@ -4,26 +4,27 @@ phases:
   install:
     commands:
       - echo Logging in to Amazon ECR
-      - #$(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
   build:
     commands:
       - echo Starting build on `date`
-      - #mvn clean install dockerfile:build
+      - mvn clean install dockerfile:build
   post_build:
     commands:
       - echo Build completed on `date`
-      - #echo Pushing the Docker images...
-      - #VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)-$(date '+%Y%m%d%H%M%S')
-      - #echo LOCAL_TAG=$LOCAL_TAG
-      - #REMOTE_TAG=$REPO_URL:$VERSION
-      - #echo REMOTE_TAG=$REMOTE_TAG
-      - #docker tag $LOCAL_TAG $REMOTE_TAG
-      - #docker push $REMOTE_TAG          
+      - echo Pushing the Docker images...
+      - VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)-$(date '+%Y%m%d%H%M%S')
+      - echo LOCAL_TAG=$LOCAL_TAG
+      - REMOTE_TAG=$REPO_URL:$VERSION
+      - echo REMOTE_TAG=$REMOTE_TAG
+      - docker tag $LOCAL_TAG $REMOTE_TAG
+      - docker push $REMOTE_TAG          
       - |
         BLUETARGET=$(aws cloudformation describe-stacks --stack-name $ALB_STACK --query "Stacks[0].Outputs[?OutputKey=='BlueTarget'].OutputValue" --output text)
         DOCKER_IMAGE=$(aws cloudformation describe-stacks --stack-name $FARGATE_STACK --query "Stacks[0].Outputs[?OutputKey=='DockerImage'].OutputValue" --output text)
         DOCKER_IMAGE2=$(aws cloudformation describe-stacks --stack-name $FARGATE_STACK --query "Stacks[0].Outputs[?OutputKey=='DockerImage2'].OutputValue" --output text)
-        if [ "$BLUETARGET" == "one" ]; then
+        if [ "$BLUETARGET" == "one" ]; 
+        then
           printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $REMOTE_TAG $DOCKER_IMAGE2 > fargateconfig.json
         else
           printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $DOCKER_IMAGE $REMOTE_TAG > fargateconfig.json
