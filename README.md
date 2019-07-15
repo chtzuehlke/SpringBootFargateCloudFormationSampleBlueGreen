@@ -1,6 +1,6 @@
 # Let's play with AWS Fargate (and a Spring Boot test workload) 
 
-(diagrams somewhat out of sync with sample code - adjustments to blue green env required)
+(diagrams somewhat out of sync with sample code - blue green adjustments required)
 
 ![High Level Overview](drawio/overview.png)
 
@@ -35,7 +35,10 @@ Steps:
 Steps:
 
     ./update-green.sh dev
+	./curl-loop-green.sh dev 
+
 	./toggle-blue-green.sh dev
+	./curl-loop-blue.sh
 
 ### Automated AWS dev env teardown (delete all CloudFormation stacks)
 
@@ -98,7 +101,7 @@ Steps:
 
 ## Behind the scenes (CloudFormation and AWS CLI)
 
-(currently somewhat out of sync with sample code - adjustments to blue green env required)
+(currently somewhat out of sync with sample code - blue green adjustments required)
 
 ![CloudFormation Stacks](drawio/stacks.png)
 
@@ -483,7 +486,7 @@ Test it:
 
 # [Bonus] Let's build a simplistic CI(/CD) pipeline (still in alpha)
 
-(currently broken - adjustments to blue green env required)
+(diagrams somewhat out of sync with sample code - blue green adjustments required)
 
 ![CodePipeline in action](drawio/pipeline.png)
 
@@ -525,3 +528,4 @@ Trigger build and deploy:
 - Version 1.4: build pipeline (currently with "barn door IAM policies" in certain roles)
 - Version 1.5: resolved build pipeline teardown issues (CF role deleted too early)
 - Version 2.0: blue/green (highly experimental)
+- Version 2.1: blue/green (pipeline adjusted)
