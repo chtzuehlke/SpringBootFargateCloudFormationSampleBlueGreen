@@ -9,7 +9,7 @@ phases:
       - echo ...
   post_build:
     commands:
-      - REMOTE_TAG=$(cat dockerimage.txt)
+      - REMOTE_TAG=$(cat $CODEBUILD_SRC_DIR_CloudformationArtifact/dockerimage.txt)
       - echo Preparing push of $REMOTE_TAG to green $NEXTSTAGE_FARGATE_STACK / $NEXTSTAGE_ALB_STACK 
       - |
         BLUETARGET=$(aws cloudformation describe-stacks --stack-name $NEXTSTAGE_ALB_STACK --query "Stacks[0].Outputs[?OutputKey=='BlueTarget'].OutputValue" --output text)
