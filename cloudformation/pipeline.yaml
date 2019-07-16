@@ -29,7 +29,19 @@ Parameters:
 
   Stage2FargateStackName:
     Type: String        
+  Stage2DBPassSSMName:
+    Type: String
+  Stage2DatabaseStack:
+    Type: String
   Stage2LoadBalancerStack:
+    Type: String
+  Stage2NetworkStack:
+    Type: String
+  Stage2TargetGroup:
+    Type: String
+  Stage2TargetGroup2:
+    Type: String
+  Stage2CloudFormationRole:
     Type: String
 
 Resources:
@@ -248,60 +260,60 @@ Resources:
                 - Name: "CloudformationArtifact"
               Region: !Ref 'AWS::Region'
               RunOrder: 1
-        - Name: "DeployGreen"
-          Actions:
-            - ActionTypeId:
-                Category: "Deploy"
-                Owner: "AWS"
-                Provider: "CloudFormation"
-                Version: "1"
-              Configuration:
-                ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_IAM
-                RoleArn: !Ref CloudFormationRole
-                StackName: !Ref FargateStackName
-                TemplateConfiguration: CloudformationArtifact::fargateconfig.json
-                TemplatePath: SourceArtifact::cloudformation/fargate.yaml
-                ParameterOverrides: !Sub | 
-                  {
-                    "NetworkStack":"${NetworkStack}",
-                    "LoadBalancerStack":"${LoadBalancerStack}",
-                    "DatabaseStack":"${DatabaseStack}",
-                    "DBPassSSMName":"${DBPassSSMName}",
-                    "TargetGroup":"${TargetGroup}",
-                    "TargetGroup2":"${TargetGroup2}"
-                  }
-              InputArtifacts:
-                - Name: CloudformationArtifact
-                - Name: SourceArtifact
-              Name: "Deploy"
-              Region: !Ref 'AWS::Region'
-              RunOrder: 1
-        - Name: "ToggleBlueGreen"
-          Actions:
-            - ActionTypeId:
-                Category: "Deploy"
-                Owner: "AWS"
-                Provider: "CloudFormation"
-                Version: "1"
-              Configuration:
-                ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_IAM
-                RoleArn: !Ref CloudFormationRole
-                StackName: !Ref LoadBalancerStack
-                TemplateConfiguration: CloudformationArtifact::albconfig.json
-                TemplatePath: SourceArtifact::cloudformation/applicationloadbalancer.yaml
-                ParameterOverrides: !Sub | 
-                  {
-                    "NetworkStack":"${NetworkStack}",
-                    "CertificateArn":"NONE"
-                  }
-              InputArtifacts:
-                - Name: CloudformationArtifact
-                - Name: SourceArtifact
-              Name: "Deploy"
-              Region: !Ref 'AWS::Region'
-              RunOrder: 1    
+#        - Name: "DeployGreen"
+#          Actions:
+#            - ActionTypeId:
+#                Category: "Deploy"
+#                Owner: "AWS"
+#                Provider: "CloudFormation"
+#                Version: "1"
+#              Configuration:
+#                ActionMode: CREATE_UPDATE
+#                Capabilities: CAPABILITY_IAM
+#                RoleArn: !Ref CloudFormationRole
+#                StackName: !Ref FargateStackName
+#                TemplateConfiguration: CloudformationArtifact::fargateconfig.json
+#                TemplatePath: SourceArtifact::cloudformation/fargate.yaml
+#                ParameterOverrides: !Sub | 
+#                  {
+#                    "NetworkStack":"${NetworkStack}",
+#                    "LoadBalancerStack":"${LoadBalancerStack}",
+#                    "DatabaseStack":"${DatabaseStack}",
+#                    "DBPassSSMName":"${DBPassSSMName}",
+#                    "TargetGroup":"${TargetGroup}",
+#                    "TargetGroup2":"${TargetGroup2}"
+#                  }
+#              InputArtifacts:
+#                - Name: CloudformationArtifact
+#                - Name: SourceArtifact
+#              Name: "Deploy"
+#              Region: !Ref 'AWS::Region'
+#              RunOrder: 1
+#        - Name: "ToggleBlueGreen"
+#          Actions:
+#            - ActionTypeId:
+#                Category: "Deploy"
+#                Owner: "AWS"
+#                Provider: "CloudFormation"
+#                Version: "1"
+#              Configuration:
+#                ActionMode: CREATE_UPDATE
+#                Capabilities: CAPABILITY_IAM
+#                RoleArn: !Ref CloudFormationRole
+#                StackName: !Ref LoadBalancerStack
+#                TemplateConfiguration: CloudformationArtifact::albconfig.json
+#                TemplatePath: SourceArtifact::cloudformation/applicationloadbalancer.yaml
+#                ParameterOverrides: !Sub | 
+#                  {
+#                    "NetworkStack":"${NetworkStack}",
+#                    "CertificateArn":"NONE"
+#                  }
+#              InputArtifacts:
+#                - Name: CloudformationArtifact
+#                - Name: SourceArtifact
+#              Name: "Deploy"
+#              Region: !Ref 'AWS::Region'
+#              RunOrder: 1    
         - Name: "Stage2Build"
           Actions:
             - ActionTypeId:
@@ -311,13 +323,44 @@ Resources:
                 Version: "1"
               Configuration:
                 ProjectName: !Join [ '', [ !Ref 'AWS::StackName', 'Stage2Build' ] ]
+                PrimarySource: "SourceArtifact"
               InputArtifacts:
+                - Name: "SourceArtifact"
                 - Name: "CloudformationArtifact"
               Name: "Build"
               OutputArtifacts:
                 - Name: "Stage2CloudformationArtifact"
               Region: !Ref 'AWS::Region'
-              RunOrder: 1                        
+              RunOrder: 1   
+        - Name: "Stage2DeployGreen"
+          Actions:
+            - ActionTypeId:
+                Category: "Deploy"
+                Owner: "AWS"
+                Provider: "CloudFormation"
+                Version: "1"
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                RoleArn: !Ref Stage2CloudFormationRole
+                StackName: !Ref Stage2FargateStackName
+                TemplateConfiguration: Stage2CloudformationArtifact::fargateconfig2.json
+                TemplatePath: SourceArtifact::cloudformation/fargate.yaml
+                ParameterOverrides: !Sub | 
+                  {
+                    "NetworkStack":"${Stage2NetworkStack}",
+                    "LoadBalancerStack":"${Stage2LoadBalancerStack}",
+                    "DatabaseStack":"${Stage2DatabaseStack}",
+                    "DBPassSSMName":"${Stage2DBPassSSMName}",
+                    "TargetGroup":"${Stage2TargetGroup}",
+                    "TargetGroup2":"${Stage2TargetGroup2}"
+                  }
+              InputArtifacts:
+                - Name: Stage2CloudformationArtifact
+                - Name: SourceArtifact
+              Name: "Deploy"
+              Region: !Ref 'AWS::Region'
+              RunOrder: 1                                   
 
   CodePipelineTriggerEventRule:
     Type: AWS::Events::Rule
