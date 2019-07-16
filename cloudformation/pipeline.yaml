@@ -27,6 +27,11 @@ Parameters:
   CloudFormationRole:
     Type: String
 
+  Stage2FargateStackName:
+    Type: String        
+  Stage2LoadBalancerStack:
+    Type: String
+
 Resources:
   PipelineArtifsctStoreBucket:
     Type: AWS::S3::Bucket
@@ -164,6 +169,42 @@ Resources:
         Type: "CODEPIPELINE"
       TimeoutInMinutes: 60
 
+  Stage2CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Join [ '', [ !Ref 'AWS::StackName', 'Stage2Build' ] ]
+      Artifacts:
+        EncryptionDisabled: true
+        Name: !Join [ '', [ !Ref 'AWS::StackName', 'Pipeline' ] ]
+        Packaging: "NONE"
+        Type: "CODEPIPELINE"
+      Description: "CodeBuild for Fargate Application"
+      Environment:
+        ComputeType: "BUILD_GENERAL1_SMALL"
+        EnvironmentVariables:
+          - Name: "NEXTSTAGE_ALB_STACK"
+            Type: "PLAINTEXT"
+            Value: !Ref Stage2LoadBalancerStack
+          - Name: "NEXTSTAGE_FARGATE_STACK"
+            Type: "PLAINTEXT"
+            Value: !Ref Stage2FargateStackName
+        Image: "aws/codebuild/java:openjdk-8"
+        ImagePullCredentialsType: "CODEBUILD"
+        PrivilegedMode: true
+        Type: "LINUX_CONTAINER"
+      LogsConfig:
+        CloudWatchLogs:
+          Status:  "ENABLED"
+        S3Logs:
+          Status:  "DISABLED"
+      QueuedTimeoutInMinutes: 480
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      Source:
+        InsecureSsl: false
+        Type: "CODEPIPELINE"
+        BuildSpec: buildspec-stage.yml
+      TimeoutInMinutes: 60      
+
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -260,7 +301,23 @@ Resources:
                 - Name: SourceArtifact
               Name: "Deploy"
               Region: !Ref 'AWS::Region'
-              RunOrder: 1              
+              RunOrder: 1    
+        - Name: "Stage2Build"
+          Actions:
+            - ActionTypeId:
+                Category: "Build"
+                Owner: "AWS"
+                Provider: "CodeBuild"
+                Version: "1"
+              Configuration:
+                ProjectName: !Join [ '', [ !Ref 'AWS::StackName', 'Stage2Build' ] ]
+              InputArtifacts:
+                - Name: "CloudformationArtifact"
+              Name: "Build"
+              OutputArtifacts:
+                - Name: "Stage2CloudformationArtifact"
+              Region: !Ref 'AWS::Region'
+              RunOrder: 1                        
 
   CodePipelineTriggerEventRule:
     Type: AWS::Events::Rule

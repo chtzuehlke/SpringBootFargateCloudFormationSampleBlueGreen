@@ -33,11 +33,13 @@ phases:
         fi        
       - cat fargateconfig.json      
       - cat albconfig.json
+      - echo $REMOTE_TAG > dockerimage.txt
 
 artifacts:
     files: 
       - fargateconfig.json
-      - albconfig.json      
+      - albconfig.json     
+      - dockerimage.txt 
 
 cache:
     paths:

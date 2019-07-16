@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo ...
+  build:
+    commands:
+      - echo ...
+  post_build:
+    commands:
+      - REMOTE_TAG=$(cat dockerimage.txt)
+      - echo Preparing push of $REMOTE_TAG to green $NEXTSTAGE_FARGATE_STACK / $NEXTSTAGE_ALB_STACK 
+      - |
+        BLUETARGET=$(aws cloudformation describe-stacks --stack-name $NEXTSTAGE_ALB_STACK --query "Stacks[0].Outputs[?OutputKey=='BlueTarget'].OutputValue" --output text)
+        DOCKER_IMAGE=$(aws cloudformation describe-stacks --stack-name $NEXTSTAGE_FARGATE_STACK --query "Stacks[0].Outputs[?OutputKey=='DockerImage'].OutputValue" --output text)
+        DOCKER_IMAGE2=$(aws cloudformation describe-stacks --stack-name $NEXTSTAGE_FARGATE_STACK --query "Stacks[0].Outputs[?OutputKey=='DockerImage2'].OutputValue" --output text)
+        if [ "$BLUETARGET" = "one" ]; 
+        then
+          printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $REMOTE_TAG $DOCKER_IMAGE2 > fargateconfig2.json
+          printf '{"Parameters":{"BlueTarget":"two"}}' > albconfig2.json
+        else
+          printf '{"Parameters":{"DockerImage":"%s","DockerImage2":"%s"}}' $DOCKER_IMAGE $REMOTE_TAG > fargateconfig2.json
+          printf '{"Parameters":{"BlueTarget":"one"}}' > albconfig2.json
+        fi        
+      - cat fargateconfig2.json      
+      - cat albconfig2.json
+
+artifacts:
+    files: 
+      - fargateconfig2.json
+      - albconfig2.json      
