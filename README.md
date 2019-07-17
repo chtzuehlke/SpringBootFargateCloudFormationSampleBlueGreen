@@ -64,11 +64,11 @@ Disclaimer:
 - Not production ready yet (e.g. automation scripts w/o error handling)
 - Flyway in prod might not always be feasible (ensure forward and backward compatibility of app and DB schema)
 
-### Infrastructure setup - from zero to production in 24'
+### Infrastructure setup - from zero to production in ~24'
 
 	./setup-showcase.sh
 
-### Deployment - from push to production in 6'
+### Deployment - from push to production in ~12'
 
 Push new version trough the pipeline:
 
@@ -78,7 +78,7 @@ Push new version trough the pipeline:
 	#./curl-loop-green.sh test
 	#./curl-loop-blue.sh test
 
-### Infrastructure teardown - from production to zero in 18'
+### Infrastructure teardown - from production to zero in ~xx'
 
 	./teardown-showcase.sh
 
