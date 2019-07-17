@@ -289,31 +289,6 @@ Resources:
               Name: "Deploy"
               Region: !Ref 'AWS::Region'
               RunOrder: 1
-#        - Name: "ToggleBlueGreen"
-#          Actions:
-#            - ActionTypeId:
-#                Category: "Deploy"
-#                Owner: "AWS"
-#                Provider: "CloudFormation"
-#                Version: "1"
-#              Configuration:
-#                ActionMode: CREATE_UPDATE
-#                Capabilities: CAPABILITY_IAM
-#                RoleArn: !Ref CloudFormationRole
-#                StackName: !Ref LoadBalancerStack
-#                TemplateConfiguration: CloudformationArtifact::albconfig.json
-#                TemplatePath: SourceArtifact::cloudformation/applicationloadbalancer.yaml
-#                ParameterOverrides: !Sub | 
-#                  {
-#                    "NetworkStack":"${NetworkStack}",
-#                    "CertificateArn":"NONE"
-#                  }
-#              InputArtifacts:
-#                - Name: CloudformationArtifact
-#                - Name: SourceArtifact
-#              Name: "Deploy"
-#              Region: !Ref 'AWS::Region'
-#              RunOrder: 1    
         - Name: "Stage2Build"
           Actions:
             - ActionTypeId:
@@ -361,6 +336,17 @@ Resources:
               Name: "Deploy"
               Region: !Ref 'AWS::Region'
               RunOrder: 1                                   
+
+        - Name: "Stage2Approval"
+          Actions:
+            - ActionTypeId:
+                Category: "Approval"
+                Owner: "AWS"
+                Provider: "Manual"
+                Version: "1"
+              Name: "QA"
+              RunOrder: 1
+
         - Name: "Stage2ToggleBlueGreen"
           Actions:
             - ActionTypeId:
