@@ -45,7 +45,7 @@ Pipeline (build, dev deployment, test blue/green deployment):
 - (Automated integration tests stage is not implemented yet)
 - Stage2Build phase: assemble CloudFormation Fargate (test) stack- and CloudFormation Load Balancer (test) stack-update properties
 - Stage2DeployGreen phase: update current Fargate (test) green service to docker image v(n). Current Fargate (test) blue service, based on docker image v(&lt;n), is still serving end user traffic
-- (Manual testing- and approval phase is not implemented yet)
+- Stage2Approval stage: manual approval after testing
 - Stage2ToggleBlueGreen phase: update Load Balancer (test) stack to switch roles of the blue and the green service. End user traffic is now served by the newly promoted blue service, based on docker image v(n). The green service, based on docker image v(&lt;n), is still available for immediate rollback.
 
 ## Infrastructure-as-Code with CloudFormation
@@ -81,7 +81,7 @@ In the AWS Web Console, go to CodePipeline and approve "blue/green toggling". Th
 	
 	./curl-loop-blue.sh test
 
-### Infrastructure teardown - from production to zero in ~xx'
+### Infrastructure teardown - from production to zero in ~29'
 
 	./teardown-showcase.sh
 
@@ -99,3 +99,5 @@ In the AWS Web Console, go to CodePipeline and approve "blue/green toggling". Th
 - Fix CloudWatch logging helpers (blue/green)
 - Speedup things deployment
 - Real/optimized blue/green deployment: desired count for green service can be 0 after pipeline is inactive for a while
+- Edge cases: as soon as v(n+1) is arriving test (green), pending approval of v(n) must be auto-rejected (further look into this)
+or transition to Stage2DeployGreen must be auto-disabled after entering Stage2DeployGreen and auto-enabled after approval/disapproval
