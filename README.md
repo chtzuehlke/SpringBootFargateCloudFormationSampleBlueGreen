@@ -62,6 +62,7 @@ Pre-Conditions:
 
 Disclaimer:
 - Not production ready yet (e.g. automation scripts w/o error handling)
+- Flyway in prod might not always be feasible (ensure forward and backward compatibility of app and DB schema)
 
 ### Infrastructure setup - from zero to production in 24'
 
@@ -73,7 +74,11 @@ Push new version trough the pipeline:
 
 	git push aws
 
-### Infrastructure teardown - from production to zero in xx'
+	#./curl-loop-blue.sh dev
+	#./curl-loop-green.sh test
+	#./curl-loop-blue.sh test
+
+### Infrastructure teardown - from production to zero in 18'
 
 	./teardown-showcase.sh
 
@@ -89,4 +94,4 @@ Push new version trough the pipeline:
 - Switch to CDK
 - CloudWatch alarms (e.g. application error log count > 0)
 - Fix CloudWatch logging helpers (blue/green)
-- ...
+- Speedup things deployment
