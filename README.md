@@ -1,5 +1,7 @@
 # DevOps at AWS - let's play with AWS Fargate and CodePipeline
 
+(this is based on https://github.com/chtzuehlke/SpringBootFargateCloudFormationSample)
+
 ## Overview
 
 ### Sample application (dev environment)
