@@ -10,7 +10,7 @@
 
 Dev environment (managed by AWS CloudFormation):
 - HTTP reverse proxy (AWS Application Load Balancer)
-- A simple REST service (dockerized Spring Boot web application)
+- A simple REST service (dockerized Spring Boot web application with flyway for automated DB migration)
 - A simple relational DB schema (AWS RDS for MySQL)
 
 ### Sample application (test environment)
@@ -63,42 +63,30 @@ Pre-Conditions:
 Disclaimer:
 - Not production ready yet (e.g. automation scripts w/o error handling)
 
-### Infrastructure setup - from zero to production in 20'
+### Infrastructure setup - from zero to production in 24'
 
-Setup dev environment (private docker registry, loadbalancer, blue service, database):
+	./setup-showcase.sh
 
-	./setup.sh dev
-
-	./curl-loop-blue.sh dev
-
-Setup test environment (loadbalancer, blue- and green services, database):
-
-	./setup-n.sh test dev
-
-	./curl-loop-blue.sh dev
-	./curl-loop-green.sh dev
-
-Setup private git repository:
-
-	./create-stack-codecommit.sh dev
-	git remote add aws $(./get-stack-output.sh helloworld-dev-git CodeCommitRepositoryCloneURL)
-
-Setup CI/CD pipeline:
-
-	./create-stack-pipeline.sh dev test
-
-### Deployment
+### Deployment - from push to production in 6'
 
 Push new version trough the pipeline:
 
 	git push aws
 
-### Infrastructure teardown
+### Infrastructure teardown - from production to zero in xx'
 
-	./teardown-stack-pipeline.sh dev
-	
-	./teardown-stack-codecommit.sh dev
-	git remote rm aws
+	./teardown-showcase.sh
 
-	./teardown-n.sh test
-	./teardown.sh dev
+## TODOs
+
+- Get rid of green service in dev env (not required)
+- Resource taggig
+- Least privilege IAM roles
+- Error handling in scripts
+- Automated integration tests (dev)
+- Automated smoke tests (test)
+- Manual approval step
+- Switch to CDK
+- CloudWatch alarms (e.g. application error log count > 0)
+- Fix CloudWatch logging helpers (blue/green)
+- ...

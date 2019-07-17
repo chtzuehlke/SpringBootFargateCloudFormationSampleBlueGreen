@@ -16,8 +16,6 @@ CLOUD_FORMATION_ROLE=$(./get-stack-output.sh $STACK_PREFIX-sg CloudFormationRole
 TARGET_GROUP1=$(./get-stack-output.sh $STACK_PREFIX-alb TargetGroup)
 TARGET_GROUP2=$(./get-stack-output.sh $STACK_PREFIX-alb TargetGroup2)
 
-#
-
 TARGET_PREFIX=${2:-default2}
 TARGET_STACK_PREFIX="helloworld-$TARGET_PREFIX"
 
@@ -27,8 +25,6 @@ TARGET_TARGET_GROUP1=$(./get-stack-output.sh $TARGET_STACK_PREFIX-alb TargetGrou
 TARGET_TARGET_GROUP2=$(./get-stack-output.sh $TARGET_STACK_PREFIX-alb TargetGroup2)
 
 TARGET_CLOUD_FORMATION_ROLE=$(./get-stack-output.sh $TARGET_STACK_PREFIX-sg CloudFormationRole)
-
-#
 
 aws cloudformation create-stack --capabilities CAPABILITY_IAM --stack-name $STACK_PREFIX-pipe --template-body file://cloudformation/pipeline.yaml --parameters \
 	ParameterKey=CodeCommitRepositoryARN,ParameterValue=$CODECOMMIT_ARN \
@@ -51,3 +47,5 @@ aws cloudformation create-stack --capabilities CAPABILITY_IAM --stack-name $STAC
 	ParameterKey=Stage2TargetGroup,ParameterValue=$TARGET_TARGET_GROUP1 \
 	ParameterKey=Stage2TargetGroup2,ParameterValue=$TARGET_TARGET_GROUP2 \
 	ParameterKey=Stage2CloudFormationRole,ParameterValue=$TARGET_CLOUD_FORMATION_ROLE
+
+aws cloudformation wait stack-create-complete --stack-name $STACK_PREFIX-pipe

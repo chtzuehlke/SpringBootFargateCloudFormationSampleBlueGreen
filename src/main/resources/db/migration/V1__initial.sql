@@ -1,5 +1,5 @@
 create table foo (
-bar int
+    bar int
 );
 
 insert into foo(bar) values (1);

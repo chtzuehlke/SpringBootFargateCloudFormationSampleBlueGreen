@@ -11,7 +11,7 @@
 
 	<groupId>com.zuehlke.cht.poc</groupId>
 	<artifactId>sample-web-workload</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>sample-web-workload</name>
 	<description>A sample Spring Boot-based web workload</description>
 
