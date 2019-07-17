@@ -75,8 +75,11 @@ Push new version trough the pipeline:
 	git push aws
 
 	#./curl-loop-blue.sh dev
-	#./curl-loop-green.sh test
-	#./curl-loop-blue.sh test
+	./curl-loop-green.sh test
+
+In the AWS Web Console, go to CodePipeline and approve "blue/green toggling". Then:
+	
+	./curl-loop-blue.sh test
 
 ### Infrastructure teardown - from production to zero in ~xx'
 
@@ -84,7 +87,7 @@ Push new version trough the pipeline:
 
 ## TODOs
 
-- Get rid of green service in dev env (not required)
+- Get rid of green service in dev env (not required - wasted $$$)
 - Resource taggig
 - Least privilege IAM roles
 - Error handling in scripts
@@ -95,3 +98,4 @@ Push new version trough the pipeline:
 - CloudWatch alarms (e.g. application error log count > 0)
 - Fix CloudWatch logging helpers (blue/green)
 - Speedup things deployment
+- Real/optimized blue/green deployment: desired count for green service can be 0 after pipeline is inactive for a while
