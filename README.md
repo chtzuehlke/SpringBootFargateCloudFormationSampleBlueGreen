@@ -93,11 +93,10 @@ In the AWS Web Console, go to CodePipeline and approve "blue/green toggling". Th
 - Error handling in scripts
 - Automated integration tests (dev)
 - Automated smoke tests (test)
-- Manual approval step
 - Switch to CDK
-- CloudWatch alarms (e.g. application error log count > 0)
-- Fix CloudWatch logging helpers (blue/green)
-- Speedup things deployment
+- CloudWatch alarms (e.g. SNS notification if application error log count > 0 for last n minutes period)
+- Fix CloudWatch logging helpers (support blue/green)
+- Improve deployment time
 - Real/optimized blue/green deployment: desired count for green service can be 0 after pipeline is inactive for a while
 - Edge cases: as soon as v(n+1) is arriving test (green), pending approval of v(n) must be auto-rejected (further look into this)
 or transition to Stage2DeployGreen must be auto-disabled after entering Stage2DeployGreen and auto-enabled after approval/disapproval
